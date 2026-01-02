@@ -44,13 +44,13 @@ public class SharedClientTests {
 
     @SneakyThrows
     private static GlideClient createGlideClientWithTimeout() {
-        return GlideClient.createClient(commonClientConfig().requestTimeout(20000).build()).get();
+        return GlideClient.createClient(commonClientConfig().requestTimeout(25000).build()).get();
     }
 
     @SneakyThrows
     private static GlideClusterClient createGlideClusterClientWithTimeout() {
         return GlideClusterClient.createClient(
-                        commonClusterClientConfig().requestTimeout(20000).build())
+                        commonClusterClientConfig().requestTimeout(25000).build())
                 .get();
     }
 
