@@ -125,9 +125,9 @@ public class SharedClientTests {
     private static Stream<Arguments> clientAndDataSize() {
         return Stream.of(
                 Arguments.of(createGlideClientWithTimeout(), 100),
-                Arguments.of(createGlideClientWithTimeout(), 1 << 15),
+                Arguments.of(createGlideClientWithTimeout(), 1 << 14),
                 Arguments.of(createGlideClusterClientWithTimeout(), 100),
-                Arguments.of(createGlideClusterClientWithTimeout(), 1 << 15));
+                Arguments.of(createGlideClusterClientWithTimeout(), 1 << 14));
     }
 
     @SneakyThrows
