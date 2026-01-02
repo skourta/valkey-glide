@@ -130,7 +130,7 @@ runs:
               target: ${{ inputs.target }}
               github-token: ${{ inputs.github-token }}
 
-        - name: Install engine
+        - name: Install engine for Linux/Mac
           if: "${{ inputs.engine-version && inputs.os != 'windows' }}"
           uses: ./.github/workflows/install-engine
           with:
