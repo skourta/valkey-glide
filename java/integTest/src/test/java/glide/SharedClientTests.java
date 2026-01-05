@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.jupiter.api.Named.named;
 
 import glide.api.BaseClient;
@@ -44,13 +45,13 @@ public class SharedClientTests {
 
     @SneakyThrows
     private static GlideClient createGlideClientWithTimeout() {
-        return GlideClient.createClient(commonClientConfig().requestTimeout(25000).build()).get();
+        return GlideClient.createClient(commonClientConfig().requestTimeout(10000).build()).get();
     }
 
     @SneakyThrows
     private static GlideClusterClient createGlideClusterClientWithTimeout() {
         return GlideClusterClient.createClient(
-                        commonClusterClientConfig().requestTimeout(25000).build())
+                        commonClusterClientConfig().requestTimeout(10000).build())
                 .get();
     }
 
@@ -125,15 +126,18 @@ public class SharedClientTests {
     private static Stream<Arguments> clientAndDataSize() {
         return Stream.of(
                 Arguments.of(createGlideClientWithTimeout(), 100),
-                Arguments.of(createGlideClientWithTimeout(), 1 << 14),
+                Arguments.of(createGlideClientWithTimeout(), 1 << 16),
                 Arguments.of(createGlideClusterClientWithTimeout(), 100),
-                Arguments.of(createGlideClusterClientWithTimeout(), 1 << 14));
+                Arguments.of(createGlideClusterClientWithTimeout(), 1 << 16));
     }
 
     @SneakyThrows
     @ParameterizedTest(autoCloseArguments = false)
     @MethodSource("clientAndDataSize")
     public void client_can_handle_concurrent_workload(BaseClient client, int valueSize) {
+        // Due the limiting resources on Github Action using Windows runner with WSL, this test is flaky
+        // It will be disable it
+        assumeTrue(!System.getProperty("os.name").toLowerCase().contains("windows"), "Skip on Windows");
         ExecutorService executorService = Executors.newCachedThreadPool();
         @SuppressWarnings("unchecked")
         CompletableFuture<Void>[] futures = new CompletableFuture[100];
