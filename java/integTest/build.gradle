@@ -122,10 +122,10 @@ tasks.register('startCluster') {
                     def args = ['python3', 'cluster_manager.py', 'start', '--cluster-mode']
                     if (System.getProperty("tls") == 'true') args.add(2, '--tls')
                     // Use no replicas for Windows to avoid replica sync issues in CI
-                    // if (isWindows) {
-                    //     args.add('-r')
-                    //     args.add('0')
-                    // }
+                    if (isWindows) {
+                        args.add('-r')
+                        args.add('0')
+                    }
                     commandLine getClusterCommand(args)
                     standardOutput = os
                 }
@@ -145,12 +145,11 @@ tasks.register('startClusterForAz') {
                     workingDir "${project.rootDir}/../utils"
                     def args = ['python3', 'cluster_manager.py', 'start', '--cluster-mode']
                     // Use different replica counts based on environment
-                    // if (isWindows) {
-                    //     args.addAll(['-r', '0'])  // No replicas for Windows CI
-                    // } else {
-                    //     args.addAll(['-r', '4'])  // 4 replicas for other environments
-                    // }
-                    args.addAll(['-r', '4'])  // 4 replicas for other environments
+                    if (isWindows) {
+                        args.addAll(['-r', '0'])  // No replicas for Windows CI
+                    } else {
+                        args.addAll(['-r', '4'])  // 4 replicas for other environments
+                    }
                     if (System.getProperty("tls") == 'true') args.add(2, '--tls')
                     commandLine getClusterCommand(args)
                     standardOutput = os
@@ -204,10 +203,10 @@ tasks.register('startClusterTls') {
                 workingDir "${project.rootDir}/../utils"
                 def args = ['python3', 'cluster_manager.py', '--tls', 'start', '--cluster-mode']
                 // Use no replicas for Windows to avoid replica sync issues in CI
-                // if (isWindows) {
-                //     args.add('-r')
-                //     args.add('0')
-                // }
+                if (isWindows) {
+                    args.add('-r')
+                    args.add('0')
+                }
                 commandLine getClusterCommand(args)
                 standardOutput = os
             }

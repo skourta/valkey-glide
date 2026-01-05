@@ -700,33 +700,10 @@ def wait_for_all_topology_views(
     tls_ca_cert_file: Optional[str] = None,
 ):
     """
-    Wait for each of the primary nodes to have a topology view that contains all nodes.
-    Only waits for primary nodes to be ready, skipping replicas.
+    Wait for each of the nodes to have a topology view that contains all nodes.
+    Only when a replica finished syncing and loading, it will be included in the CLUSTER SLOTS output.
     """
-    # First, identify which servers are primaries by checking cluster nodes
-    primary_servers = []
     for server in servers:
-        # Get the node's role first
-        cmd_args = [
-            get_cli_command(),
-            "-h",
-            server.host,
-            "-p",
-            str(server.port),
-            *get_cli_option_args(cluster_folder, use_tls, None, tls_cert_file, tls_key_file, tls_ca_cert_file),
-            "cluster",
-            "nodes",
-        ]
-        cluster_nodes_output = redis_cli_run_command(cmd_args)
-        node_info = parse_cluster_nodes(cluster_nodes_output)
-        if node_info and node_info["is_primary"]:
-            primary_servers.append(server)
-            server.set_primary(True)
-        else:
-            server.set_primary(False)
-    
-    # Now wait only for primary servers to have complete topology view
-    for server in primary_servers:
         cmd_args = [
             get_cli_command(),
             "-h",
@@ -741,10 +718,23 @@ def wait_for_all_topology_views(
         retries = 80
         while retries >= 0:
             output = redis_cli_run_command(cmd_args)
-            # Only check that primary nodes are present in the topology
-            primary_count = sum(1 for s in primary_servers if f"{s.host}" in output) if output else 0
-            if output is not None and primary_count == len(primary_servers):
-                logging.debug(f"Primary server {server} is ready!")
+            if output is not None and output.count(f"{server.host}") == len(servers):
+                # Server is ready, get the node's role
+                cmd_args = [
+                    get_cli_command(),
+                    "-h",
+                    server.host,
+                    "-p",
+                    str(server.port),
+                    *get_cli_option_args(cluster_folder, use_tls, None, tls_cert_file, tls_key_file, tls_ca_cert_file),
+                    "cluster",
+                    "nodes",
+                ]
+                cluster_slots_output = redis_cli_run_command(cmd_args)
+                node_info = parse_cluster_nodes(cluster_slots_output)
+                if node_info:
+                    server.set_primary(node_info["is_primary"])
+                logging.debug(f"Server {server} is ready!")
                 break
             else:
                 retries -= 1
@@ -753,7 +743,7 @@ def wait_for_all_topology_views(
 
         if retries < 0:
             raise Exception(
-                f"Timeout exceeded trying to wait for primary server {server} to know all primary hosts.\n"
+                f"Timeout exceeded trying to wait for server {server} to know all hosts.\n"
                 f"Current CLUSTER SLOTS output:\n{output}"
             )
 
