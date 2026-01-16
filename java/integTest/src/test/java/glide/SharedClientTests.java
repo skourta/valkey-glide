@@ -135,8 +135,8 @@ public class SharedClientTests {
     @ParameterizedTest(autoCloseArguments = false)
     @MethodSource("clientAndDataSize")
     public void client_can_handle_concurrent_workload(BaseClient client, int valueSize) {
-        // Due the limiting resources on Github Action using Windows runner with WSL, this test is flaky
-        // It will be disable it
+        // Due to limited resources on Github Action when using a Windows runner with WSL, this test is flaky.
+        // It will be disabled.
         assumeTrue(!System.getProperty("os.name").toLowerCase().contains("windows"), "Skip on Windows");
         ExecutorService executorService = Executors.newCachedThreadPool();
         @SuppressWarnings("unchecked")
