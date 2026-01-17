@@ -4,6 +4,7 @@ package glide;
 import static glide.TestUtilities.commonClientConfig;
 import static glide.TestUtilities.commonClusterClientConfig;
 import static glide.TestUtilities.getRandomString;
+import static glide.TestUtilities.isWindows;
 import static glide.api.BaseClient.OK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -138,7 +139,7 @@ public class SharedClientTests {
         // Due to limited resources on Github Action when using a Windows runner with WSL, this test is
         // flaky.
         // It will be disabled.
-        assumeTrue(!System.getProperty("os.name").toLowerCase().contains("windows"), "Skip on Windows");
+        assumeTrue(!isWindows(), "Skip on Windows");
         ExecutorService executorService = Executors.newCachedThreadPool();
         @SuppressWarnings("unchecked")
         CompletableFuture<Void>[] futures = new CompletableFuture[100];

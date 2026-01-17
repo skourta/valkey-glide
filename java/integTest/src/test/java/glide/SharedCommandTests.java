@@ -5,6 +5,7 @@ import static glide.TestConfiguration.SERVER_VERSION;
 import static glide.TestUtilities.assertDeepEquals;
 import static glide.TestUtilities.commonClientConfig;
 import static glide.TestUtilities.commonClusterClientConfig;
+import static glide.TestUtilities.isWindows;
 import static glide.api.BaseClient.OK;
 import static glide.api.models.GlideString.gs;
 import static glide.api.models.commands.LInsertOptions.InsertPosition.AFTER;
@@ -17607,7 +17608,7 @@ public class SharedCommandTests {
 
         // assert that wait returns 0 under standalone and 1 under cluster mode.
         long clientReplicas = client instanceof GlideClient ? 0 : 1;
-        if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+        if (isWindows()) {
             clientReplicas = 0;
         }
         assertEquals(OK, client.set(key, "value").get());
@@ -17631,7 +17632,7 @@ public class SharedCommandTests {
                         : GlideClusterClient.createClient(commonClusterClientConfig().build()).get()) {
 
             long clientReplicas = client instanceof GlideClient ? 0 : 1;
-            if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+            if (isWindows()) {
                 clientReplicas = 0;
             }
             // ensure that commands do not time out, even if timeout > request timeout

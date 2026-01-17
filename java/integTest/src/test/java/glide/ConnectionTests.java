@@ -273,7 +273,7 @@ public class ConnectionTests {
         long matchingEntries =
                 infoData.values().stream().filter(value -> value.contains(getCmdstat)).count();
         long expectedReplicas = 4;
-        if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+        if (isWindows()) {
             expectedReplicas = 0;
         }
 
@@ -447,7 +447,7 @@ public class ConnectionTests {
         // limitation
         // on Github Action using Windows runner with WSL, which is making the server with replicas hang
         // and not be fully initialized
-        assumeTrue(!System.getProperty("os.name").toLowerCase().contains("windows"), "Skip on Windows");
+        assumeTrue(!isWindows(), "Skip on Windows");
 
         String clientAz = "us-east-1b"; // Client is in 1B
         String otherAz = "us-east-1a"; // Other nodes in 1A

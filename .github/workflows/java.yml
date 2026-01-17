@@ -101,10 +101,6 @@ jobs:
                 java: ${{ fromJson(needs.get-matrices.outputs.version-matrix-output) }}
                 engine: ${{ fromJson(needs.get-matrices.outputs.engine-matrix-output) }}
                 host: ${{ fromJson(needs.get-matrices.outputs.host-matrix-output) }}
-                exclude:
-                    # Exclude Redis 6.2 on Windows.
-                    - engine: { type: "redis", version: "6.2" }
-                      host: { OS: "windows" }
         runs-on: ${{ matrix.host.RUNNER }}
 
         steps:
