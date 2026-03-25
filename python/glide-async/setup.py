@@ -259,6 +259,7 @@ if not from_sdist:
 
 setup(
     name="valkey-glide",  # Package name for the async client
+    packages=["glide", "glide_shared"],
     package_data={"glide": ["*.so", "*.dll", "*.dylib", "*.pyi", "py.typed", "*.pyd"]},
     distclass=BinaryDistribution,
     cmdclass={
