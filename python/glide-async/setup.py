@@ -241,6 +241,18 @@ class build_py(build_py_orig):
         super().run()
 
 
+# ==============================================================================
+# PRE-BUILD PREPARATION
+# We must generate and vendor files BEFORE calling setup() so that PEP 517
+# build frontends (like `uv` or `pip`) see the files during the metadata phase.
+# ==============================================================================
+from_sdist = Path("PKG-INFO").exists()
+
+# If we are NOT building from a pre-packaged sdist, vendor the files now.
+if not from_sdist:
+    generate_protobufs()
+    vendor_dependencies()
+
 # ------------------------------------------------------------------------------
 # Setup configuration
 # ------------------------------------------------------------------------------
@@ -250,10 +262,8 @@ setup(
     package_data={"glide": ["*.so", "*.dll", "*.dylib", "*.pyi", "py.typed", "*.pyd"]},
     distclass=BinaryDistribution,
     cmdclass={
-        "build_py": build_py,
         "build_ext": build_ext,
         "bdist_wheel": bdist_wheel,
-        "sdist": sdist,
-        "clean": CleanCommand,  # type: ignore
+        "clean": CleanCommand,
     },
 )
